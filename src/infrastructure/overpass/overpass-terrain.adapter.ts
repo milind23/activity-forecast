@@ -32,7 +32,18 @@ export class OverpassTerrainAdapter implements TerrainProviderPort {
     longitude: number,
     radiusKm: number,
   ): Promise<boolean> {
-    const query = buildSkiAreaQuery(latitude, longitude, radiusKm);
+    // Cheap query first (resort areas); the piste query is much heavier in dense
+    // regions like the Alps, so only run it when no resort polygon is mapped.
+    const [resorts, pistes] = buildSkiAreaQueries(
+      latitude,
+      longitude,
+      radiusKm,
+    );
+    return (await this.anyMatch(resorts)) || (await this.anyMatch(pistes));
+  }
+
+  /** Runs one query against the configured endpoints, with a retry each. */
+  private async anyMatch(query: string): Promise<boolean> {
     let lastError: unknown = new Error('no Overpass endpoint configured');
     for (const url of this.cfg.overpassUrls) {
       for (let attempt = 1; attempt <= ATTEMPTS_PER_ENDPOINT; attempt++) {
@@ -41,7 +52,7 @@ export class OverpassTerrainAdapter implements TerrainProviderPort {
         } catch (err) {
           lastError = err;
           this.logger.warn(
-            `Overpass ${url} attempt ${attempt} failed: ${(err as Error).message}`,
+            `Overpass ${url} attempt ${attempt} failed: ${(err as Error).message.slice(0, 120)}`,
           );
           await sleep(RETRY_DELAY_MS * attempt);
         }
@@ -67,16 +78,15 @@ export class OverpassTerrainAdapter implements TerrainProviderPort {
   }
 }
 
-export function buildSkiAreaQuery(
+/** [resort areas query, downhill pistes query]; each only needs one hit. */
+export function buildSkiAreaQueries(
   lat: number,
   lon: number,
   radiusKm: number,
-): string {
+): [string, string] {
   const around = `around:${Math.round(radiusKm * 1000)},${lat},${lon}`;
-  return `[out:json][timeout:25];
-(
-  nwr["landuse"="winter_sports"](${around});
-  way["piste:type"="downhill"](${around});
-);
-out ids 1;`;
+  return [
+    `[out:json][timeout:25];nwr["landuse"="winter_sports"](${around});out ids 1;`,
+    `[out:json][timeout:25];way["piste:type"="downhill"](${around});out ids 1;`,
+  ];
 }

@@ -4,7 +4,7 @@ import {
   parseOpenMeteoMarine,
 } from './open-meteo-marine.adapter';
 import { parseOpenMeteoForecast } from './open-meteo-weather.adapter';
-import { buildSkiAreaQuery } from '../overpass/overpass-terrain.adapter';
+import { buildSkiAreaQueries } from '../overpass/overpass-terrain.adapter';
 
 describe('Open-Meteo parsers', () => {
   it('maps the forecast payload and takes the daily max of hourly snow depth', () => {
@@ -105,9 +105,9 @@ describe('Open-Meteo parsers', () => {
   });
 
   it('builds an Overpass query for ski resorts and downhill pistes within the radius', () => {
-    const q = buildSkiAreaQuery(45.92, 6.87, 50);
-    expect(q).toContain('"landuse"="winter_sports"');
-    expect(q).toContain('"piste:type"="downhill"');
-    expect(q).toContain('around:50000,45.92,6.87');
+    const [resorts, pistes] = buildSkiAreaQueries(45.92, 6.87, 50);
+    expect(resorts).toContain('"landuse"="winter_sports"');
+    expect(pistes).toContain('"piste:type"="downhill"');
+    expect(resorts).toContain('around:50000,45.92,6.87');
   });
 });
