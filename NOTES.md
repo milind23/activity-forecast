@@ -107,7 +107,7 @@ capped components so they're easy to reason about and adjust:
 
 | Activity | Rule (v1) |
 |---|---|
-| Skiing | gate on ski area; snow base ≤45 (0 below 10 cm, full at 1 m) + fresh snow ≤25 (full at 10 cm) + temp ≤20 (max temp −12…2 °C) + calm wind ≤10; capped at 10 with no snow |
+| Skiing | gate on ski area; snow base ≤45 (0 below 10 cm, full at 1 m) + fresh snow ≤25 (full at 10 cm) + temp ≤20 (max temp −12…2 °C) + calm wind ≤10; 0 with no base and no fresh snow |
 | Surfing | `null` without marine data; wave height ≤50 (sweet spot 1–2.5 m, 0 if flat <0.3 m) + period ≤30 (6→12 s) + light wind ≤20 |
 | Outdoor | 100 − rain ≤45 − temperature ≤30 (3/°C outside 15–26 °C) − wind ≤15 − lack of sun ≤10; thunderstorm caps at 10 |
 | Indoor | `40 + (100 − outdoor) × 0.6`: always possible, better when it's grim outside |

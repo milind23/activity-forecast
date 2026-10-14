@@ -7,7 +7,7 @@
  *   fresh snow  up to 25 pts  (snowfall that day; full at 10 cm)
  *   temperature up to 20 pts  (max temp in the "good snow" band)
  *   calm wind   up to 10 pts  (lifts close in strong wind)
- * with a cap when there is essentially no snow at all.
+ * No snow base and no fresh snow => 0 ("little or no snow"): nothing to ski on.
  */
 import { DailyWeather } from '../weather';
 import { ScoreResult, clampScore, scale } from '../score';
@@ -29,8 +29,8 @@ export const SKI = {
   WIND_CALM_KMH: 30,
   WIND_LIFTS_CLOSED_KMH: 60,
   WIND_POINTS: 10,
-  /** If there's no base and no fresh snow, the score is capped here. */
-  NO_SNOW_CAP: 10,
+  /** No base and no fresh snow means nothing to ski on: capped here (0 keeps bestDay null). */
+  NO_SNOW_CAP: 0,
 } as const;
 
 export function scoreSkiing(

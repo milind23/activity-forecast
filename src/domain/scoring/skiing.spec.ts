@@ -24,9 +24,9 @@ describe('scoreSkiing', () => {
     expect(scoreSkiing(powderDay, 'nearby').score).toBe(100);
   });
 
-  it('caps the score when there is no snow at all', () => {
+  it('scores 0 when there is no snow at all', () => {
     const r = scoreSkiing(makeDay({ tempMaxC: 0 }), 'nearby');
-    expect(r.score).toBeLessThanOrEqual(10);
+    expect(r.score).toBe(0);
     expect(r.reason).toContain('little or no snow');
   });
 
@@ -51,6 +51,6 @@ describe('scoreSkiing', () => {
       makeDay({ snowDepthM: null, snowfallCm: null }),
       'nearby',
     );
-    expect(r.score).toBeLessThanOrEqual(10);
+    expect(r.score).toBe(0);
   });
 });
