@@ -1,0 +1,81 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+enum Activity {
+  INDOOR_SIGHTSEEING
+  OUTDOOR_SIGHTSEEING
+  SKIING
+  SURFING
+}
+
+type ActivityForecast {
+  activities: [ActivityRanking!]!
+  dataFreshness: DataFreshness!
+  location: Location!
+}
+
+type ActivityRanking {
+  activity: Activity!
+
+  """Best date, null if no day scores above 0"""
+  bestDay: String
+
+  """Sorted best-first"""
+  days: [DayScore!]!
+}
+
+type DataFreshness {
+  """When the underlying forecast was fetched from Open-Meteo"""
+  fetchedAt: DateTime!
+
+  """true if a refresh failed and older stored data is being served"""
+  isStale: Boolean!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DayScore {
+  """Local date, YYYY-MM-DD"""
+  date: String!
+  reason: String!
+
+  """0-100; null when it cannot be assessed"""
+  score: Int
+}
+
+type Location {
+  country: String!
+
+  """ISO 3166-1 alpha-2"""
+  countryCode: String!
+  latitude: Float!
+  longitude: Float!
+  name: String!
+
+  """State/region, helps with ambiguous names"""
+  region: String
+
+  """IANA timezone; all dates are local to it"""
+  timezone: String!
+}
+
+type Query {
+  """
+  Ranks the next 7 days for skiing, surfing, outdoor and indoor sightseeing in a city. Each activity lists its days best-first plus a bestDay.
+  """
+  activityForecast(
+    """
+    City or town name, e.g. "Chamonix"
+    """
+    city: String!
+
+    """
+    Optional ISO 3166-1 alpha-2 country filter, e.g. "FR"
+    """
+    country: String
+  ): ActivityForecast!
+}
