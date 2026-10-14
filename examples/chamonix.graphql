@@ -1,0 +1,12 @@
+# Alpine ski resort: skiing scored on snow (ski area found via OpenStreetMap), surfing has no coastal data.
+query ActivityForecast {
+  activityForecast(city: "Chamonix", country: "FR") {
+    location { name country countryCode region latitude longitude timezone }
+    dataFreshness { fetchedAt isStale }
+    activities {
+      activity
+      bestDay
+      days { date score reason }
+    }
+  }
+}

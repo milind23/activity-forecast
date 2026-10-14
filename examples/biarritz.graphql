@@ -1,0 +1,12 @@
+# Atlantic surf town: surfing scored on wave height/period, no ski area nearby.
+query ActivityForecast {
+  activityForecast(city: "Biarritz", country: "FR") {
+    location { name country countryCode region latitude longitude timezone }
+    dataFreshness { fetchedAt isStale }
+    activities {
+      activity
+      bestDay
+      days { date score reason }
+    }
+  }
+}

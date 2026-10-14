@@ -1,0 +1,12 @@
+# Ambiguous name, no country filter: the top geocoding match wins (Paris, FR). Add country: "US" for Paris, Texas.
+query ActivityForecast {
+  activityForecast(city: "Paris") {
+    location { name country countryCode region latitude longitude timezone }
+    dataFreshness { fetchedAt isStale }
+    activities {
+      activity
+      bestDay
+      days { date score reason }
+    }
+  }
+}

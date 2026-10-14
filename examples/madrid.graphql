@@ -1,0 +1,12 @@
+# Inland capital: no coastal data for surfing; sightseeing driven by weather.
+query ActivityForecast {
+  activityForecast(city: "Madrid", country: "ES") {
+    location { name country countryCode region latitude longitude timezone }
+    dataFreshness { fetchedAt isStale }
+    activities {
+      activity
+      bestDay
+      days { date score reason }
+    }
+  }
+}
