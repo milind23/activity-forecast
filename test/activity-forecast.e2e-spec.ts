@@ -149,7 +149,7 @@ describe('activityForecast query (e2e)', () => {
   it('rejects an invalid country code with a validation error', async () => {
     const res = await gql({ city: 'Paris', country: 'France' }).expect(200);
     expect(res.body.errors[0].extensions.code).toBe('BAD_REQUEST');
-    expect(JSON.stringify(res.body.errors[0])).toContain('2-letter ISO');
+    expect(res.body.errors[0].message).toContain('2-letter ISO');
     expect(geocoder.search).not.toHaveBeenCalledWith(
       'Paris',
       expect.anything(),
