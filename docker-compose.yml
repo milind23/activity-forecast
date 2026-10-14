@@ -1,0 +1,15 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # Any variable from .env.example can be set here.
+      FORECAST_TTL_HOURS: "3"
+    volumes:
+      # Keeps the SQLite cache across restarts.
+      - forecast-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  forecast-data:
