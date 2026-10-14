@@ -2,7 +2,6 @@ import { Args, Query, Resolver } from '@nestjs/graphql';
 import { ActivityForecastService } from '../../application/activity-forecast.service';
 import { ActivityForecastArgs } from './activity-forecast.args';
 import { ActivityForecastType } from './types';
-import { toGraphQLError } from './error-mapping';
 
 @Resolver(() => ActivityForecastType)
 export class ActivityForecastResolver {
@@ -16,10 +15,6 @@ export class ActivityForecastResolver {
   async activityForecast(
     @Args() { city, country }: ActivityForecastArgs,
   ): Promise<ActivityForecastType> {
-    try {
-      return await this.service.getForecast(city, country);
-    } catch (err) {
-      throw toGraphQLError(err);
-    }
+    return this.service.getForecast(city, country);
   }
 }
