@@ -152,11 +152,33 @@ describe('ActivityForecastService', () => {
     const result = await service.getForecast('Chamonix');
     expect(result.activities[0].days[0]).toMatchObject({
       score: null,
-      reason: 'ski area lookup unavailable',
+      reason: 'ski area lookup unavailable, try again shortly',
     });
     expect(repo.terrain.size).toBe(0);
     await service.getForecast('Chamonix');
     expect(terrain.hasSkiAreaNearby).toHaveBeenCalledTimes(2);
+  });
+
+  it('answers without the ski-area lookup if it exceeds the deadline, and caches it later', async () => {
+    const { service, terrain, repo } = setup();
+    let finish: (v: boolean) => void = () => undefined;
+    terrain.hasSkiAreaNearby.mockImplementationOnce(
+      () => new Promise<boolean>((r) => (finish = r)),
+    );
+    jest.useFakeTimers({
+      doNotFake: ['nextTick', 'setImmediate', 'queueMicrotask'],
+    });
+    try {
+      const pending = service.getForecast('Chamonix');
+      await jest.advanceTimersByTimeAsync(20000);
+      const result = await pending;
+      expect(result.activities[0].days[0].score).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+    finish(true);
+    await new Promise((r) => setImmediate(r));
+    expect([...repo.terrain.values()][0].hasSkiArea).toBe(true);
   });
 
   it('still answers when the marine fetch fails', async () => {

@@ -76,9 +76,7 @@ export class ActivityForecastService {
       this.flights.run(`forecast:${key}`, () =>
         this.getSnapshot(location, key),
       ),
-      this.flights.run(`terrain:${key}`, () =>
-        this.getSkiAreaStatus(location, key),
-      ),
+      this.skiAreaWithDeadline(location, key),
     ]);
 
     const today = localDate(new Date(), location.timezone);
@@ -167,6 +165,31 @@ export class ActivityForecastService {
       );
       return null;
     }
+  }
+
+  /**
+   * A first-time Overpass lookup can be slow (busy public servers). Rather than
+   * hold the whole response hostage, wait up to TERRAIN_LOOKUP_DEADLINE_MS and
+   * answer with 'unknown' (skiing = null); the lookup keeps running and its
+   * result is cached for the next request.
+   */
+  private skiAreaWithDeadline(
+    location: Location,
+    key: string,
+  ): Promise<SkiAreaStatus> {
+    const lookup = this.flights.run(`terrain:${key}`, () =>
+      this.getSkiAreaStatus(location, key),
+    );
+    let timer: NodeJS.Timeout | undefined;
+    const deadline = new Promise<SkiAreaStatus>((resolve) => {
+      timer = setTimeout(() => {
+        this.logger.warn(
+          `Ski-area lookup for ${key} still running; answering without it`,
+        );
+        resolve('unknown');
+      }, this.cfg.terrainLookupDeadlineMs);
+    });
+    return Promise.race([lookup, deadline]).finally(() => clearTimeout(timer));
   }
 
   private async getSkiAreaStatus(

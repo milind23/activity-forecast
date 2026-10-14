@@ -39,7 +39,10 @@ export function scoreSkiing(
 ): ScoreResult {
   if (skiArea === 'none') return { score: 0, reason: 'no ski area nearby' };
   if (skiArea === 'unknown')
-    return { score: null, reason: 'ski area lookup unavailable' };
+    return {
+      score: null,
+      reason: 'ski area lookup unavailable, try again shortly',
+    };
 
   const depth = day.snowDepthM ?? 0;
   const snowfall = day.snowfallCm ?? 0;

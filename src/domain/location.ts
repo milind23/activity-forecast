@@ -3,6 +3,8 @@ export interface Location {
   name: string;
   country: string;
   countryCode: string;
+  /** First-level admin area (state/region), helps disambiguate e.g. Paris FR vs Paris US. */
+  region?: string;
   latitude: number;
   longitude: number;
   /** IANA timezone, e.g. "Europe/Paris". Days are expressed in this zone. */

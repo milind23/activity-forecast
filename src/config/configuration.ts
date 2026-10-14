@@ -12,7 +12,10 @@ export interface AppConfig {
   geocodingUrl: string;
   forecastUrl: string;
   marineUrl: string;
-  overpassUrl: string;
+  /** Tried in order until one answers (public Overpass instances are often busy). */
+  overpassUrls: string[];
+  /** How long a request waits for a first-time ski-area lookup before answering without it. */
+  terrainLookupDeadlineMs: number;
 }
 
 const num = (v: string | undefined, fallback: number): number => {
@@ -32,7 +35,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       env.GEOCODING_URL || 'https://geocoding-api.open-meteo.com/v1/search',
     forecastUrl: env.FORECAST_URL || 'https://api.open-meteo.com/v1/forecast',
     marineUrl: env.MARINE_URL || 'https://marine-api.open-meteo.com/v1/marine',
-    overpassUrl: env.OVERPASS_URL || 'https://overpass-api.de/api/interpreter',
+    overpassUrls: (
+      env.OVERPASS_URLS ||
+      'https://overpass-api.de/api/interpreter,https://overpass.kumi.systems/api/interpreter,https://overpass.private.coffee/api/interpreter'
+    )
+      .split(',')
+      .map((u) => u.trim())
+      .filter(Boolean),
+    terrainLookupDeadlineMs: num(env.TERRAIN_LOOKUP_DEADLINE_MS, 15000),
   };
 }
 
