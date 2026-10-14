@@ -1,0 +1,185 @@
+{
+  "data": {
+    "activityForecast": {
+      "location": {
+        "name": "Paris",
+        "country": "France",
+        "countryCode": "FR",
+        "region": "Île-de-France Region",
+        "latitude": 48.85341,
+        "longitude": 2.3488,
+        "timezone": "Europe/Paris"
+      },
+      "dataFreshness": {
+        "fetchedAt": "2026-10-14T16:35:53.288Z",
+        "isStale": false
+      },
+      "activities": [
+        {
+          "activity": "SKIING",
+          "bestDay": null,
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": 0,
+              "reason": "no ski area nearby"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 0,
+              "reason": "no ski area nearby"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 0,
+              "reason": "no ski area nearby"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 0,
+              "reason": "no ski area nearby"
+            },
+            {
+              "date": "2026-10-18",
+              "score": 0,
+              "reason": "no ski area nearby"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 0,
+              "reason": "no ski area nearby"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 0,
+              "reason": "no ski area nearby"
+            }
+          ]
+        },
+        {
+          "activity": "SURFING",
+          "bestDay": null,
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-15",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-16",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-17",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-18",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-19",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-20",
+              "score": null,
+              "reason": "no coastal data"
+            }
+          ]
+        },
+        {
+          "activity": "OUTDOOR_SIGHTSEEING",
+          "bestDay": "2026-10-14",
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": 100,
+              "reason": "pleasant 21°C, sunny"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 100,
+              "reason": "pleasant 23°C, sunny"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 100,
+              "reason": "pleasant 15°C, sunny"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 100,
+              "reason": "pleasant 16°C, sunny"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 93,
+              "reason": "pleasant 21°C, sunny"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 85,
+              "reason": "cool (14°C max)"
+            },
+            {
+              "date": "2026-10-18",
+              "score": 83,
+              "reason": "cool (13°C max)"
+            }
+          ]
+        },
+        {
+          "activity": "INDOOR_SIGHTSEEING",
+          "bestDay": "2026-10-18",
+          "days": [
+            {
+              "date": "2026-10-18",
+              "score": 50,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 49,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 44,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-14",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

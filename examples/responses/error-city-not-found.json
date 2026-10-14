@@ -1,0 +1,21 @@
+{
+  "errors": [
+    {
+      "message": "City not found: \"Xyzzyville\"",
+      "locations": [
+        {
+          "line": 3,
+          "column": 3
+        }
+      ],
+      "path": [
+        "activityForecast"
+      ],
+      "extensions": {
+        "code": "CITY_NOT_FOUND",
+        "city": "Xyzzyville"
+      }
+    }
+  ],
+  "data": null
+}

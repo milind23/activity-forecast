@@ -1,99 +1,223 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Activity Forecast
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+GraphQL API (NestJS + TypeScript) that, for a city or town, ranks the next 7 days for
+**skiing**, **surfing**, **outdoor sightseeing** and **indoor sightseeing**.
+Weather from [Open-Meteo](https://open-meteo.com) (forecast, marine, geocoding — no API
+key), ski areas from OpenStreetMap (Overpass). Data is persisted in SQLite and refreshed
+lazily. No front end.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+> Decision log with the reasoning behind every choice: **[NOTES.md](NOTES.md)**.
 
-## Description
+## Quickstart (60 seconds)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+Needs Node.js 20+.
 
 ```bash
-$ npm install
+npm install
+npm run start:dev
+# open http://localhost:3000/graphql  (Apollo Sandbox, example query pre-filled)
 ```
 
-## Compile and run the project
+No `.env` needed; the SQLite file is created at `data/activity-forecast.sqlite`.
+All settings are optional and documented in [.env.example](.env.example).
+
+Or with Docker:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker compose up --build
+# http://localhost:3000/graphql
 ```
 
-## Run tests
+From the command line (needs the server running):
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+examples/query.sh                       # Chamonix
+examples/query.sh biarritz.graphql madrid.graphql paris-ambiguous.graphql
 ```
 
-## Deployment
+## Example
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```graphql
+query {
+  activityForecast(city: "Chamonix", country: "FR") {
+    location { name country latitude longitude timezone }
+    dataFreshness { fetchedAt isStale }
+    activities { activity bestDay days { date score reason } }
+  }
+}
+```
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Response (trimmed; full live responses in [examples/responses/](examples/responses/)):
+
+```jsonc
+// Chamonix, FR (live, 2026-10-14T16:20:47.931Z)
+{
+  "location": {"name":"Chamonix","country":"France","latitude":45.92375,"longitude":6.86933,"timezone":"Europe/Paris"},
+  "dataFreshness": {"fetchedAt":"2026-10-14T16:20:47.931Z","isStale":false},
+  "activities": [
+    {
+      "activity": "SKIING", "bestDay": null,
+      "days": [
+        { "date": "2026-10-14", "score": 0, "reason": "little or no snow, snow depth 0 cm, mild (19°C max)" },
+        { "date": "2026-10-15", "score": 0, "reason": "little or no snow, snow depth 0 cm, mild (21°C max)" }
+        // …5 more, best-first
+      ]
+    },
+    {
+      "activity": "SURFING", "bestDay": null,
+      "days": [
+        { "date": "2026-10-14", "score": null, "reason": "no coastal data" },
+        { "date": "2026-10-15", "score": null, "reason": "no coastal data" }
+        // …5 more, best-first
+      ]
+    },
+    {
+      "activity": "OUTDOOR_SIGHTSEEING", "bestDay": "2026-10-14",
+      "days": [
+        { "date": "2026-10-14", "score": 100, "reason": "pleasant 19°C, sunny" },
+        { "date": "2026-10-15", "score": 100, "reason": "pleasant 21°C, sunny" }
+        // …5 more, best-first
+      ]
+    },
+    {
+      "activity": "INDOOR_SIGHTSEEING", "bestDay": "2026-10-18",
+      "days": [
+        { "date": "2026-10-18", "score": 72, "reason": "always available; mixed weather outside" },
+        { "date": "2026-10-17", "score": 48, "reason": "always available, but the weather favours being outdoors" }
+        // …5 more, best-first
+      ]
+    }
+  ]
+}
+
+// Biarritz, FR: surfing
+{
+  "activity": "SURFING", "bestDay": "2026-10-20",
+  "days": [
+    { "date": "2026-10-20", "score": 100, "reason": "waves 1.3 m, period 14 s" },
+    { "date": "2026-10-16", "score": 98, "reason": "waves 2.0 m, period 13 s" },
+    { "date": "2026-10-15", "score": 96, "reason": "waves 1.7 m, period 12 s" }
+    // …4 more, best-first
+  ]
+}
+```
+
+- `score` is an `Int` 0–100, or `null` when the activity can't be assessed
+  (`no coastal data`, or the ski-area lookup is temporarily unavailable).
+- Each activity's `days` are sorted best-first; `bestDay` is `null` if nothing scores above 0.
+- Dates are local to the location's timezone.
+- Errors carry `extensions.code`: `CITY_NOT_FOUND`, `UPSTREAM_UNAVAILABLE`, `BAD_REQUEST`
+  (e.g. `country` not a 2-letter ISO code).
+
+The full schema is in [schema.gql](schema.gql) (generated from the code).
+
+## Architecture
+
+```mermaid
+flowchart LR
+  client([GraphQL client]) --> R
+
+  subgraph presentation
+    R[ActivityForecastResolver<br/>+ args validation<br/>+ error filter]
+  end
+
+  subgraph application
+    S[ActivityForecastService<br/>use case]
+    P{{Ports:<br/>Geocoder · WeatherProvider · MarineProvider<br/>TerrainProvider · ForecastRepository}}
+  end
+
+  subgraph domain
+    D[Scoring functions<br/>+ ranking<br/>pure, no Nest]
+  end
+
+  subgraph infrastructure
+    G[Open-Meteo geocoding]
+    W[Open-Meteo forecast]
+    M[Open-Meteo marine]
+    O[Overpass / OSM]
+    DB[(SQLite<br/>TypeORM + sql.js)]
+  end
+
+  R --> S
+  S --> D
+  S --> P
+  P -.implemented by.-> G & W & M & O & DB
+```
+
+```
+src/
+  domain/          entities, value objects, scoring/ (one file per activity), ranking
+  application/     ActivityForecastService, ports/ (interfaces + DI tokens), errors, SingleFlight
+  infrastructure/  open-meteo/, overpass/, http/, persistence/ (TypeORM entities + repo)
+  presentation/    graphql/ (resolver, types, args, error filter, Sandbox example)
+  config/          typed config with defaults
+```
+
+## Persistence & refresh
+
+| Data | Stored as | Fresh for |
+|---|---|---|
+| Geocoding (`city|country` → place) | `geocode_cache` | forever |
+| Weather + marine forecast | raw JSON in `forecast_snapshot` with `fetchedAt` | `FORECAST_TTL_HOURS` (3) |
+| "Ski area within 50 km?" | `ski_terrain` | `TERRAIN_CACHE_DAYS` (90) |
+
+- **Lazy refresh**: a request finds the stored snapshot; if it is older than the TTL it
+  refetches, otherwise serves from SQLite.
+- **One fetch per location at a time**: concurrent requests share the same in-flight
+  promise.
+- **Upstream down?** Serve the last stored data with `dataFreshness.isStale: true`.
+  Only if nothing is stored do we return `UPSTREAM_UNAVAILABLE`.
+- **Scores are computed per request** from the stored raw payloads, so scoring rules can
+  change without refetching.
+- **No cron**: there's no fixed set of cities to refresh; lazy refresh spends API calls
+  only on places people ask about and keeps it a single process (see NOTES D6).
+
+## Scoring (v1 heuristics, tunable)
+
+Simple, commented, pure functions in `src/domain/scoring/`, constants at the top of each
+file. Summary in [NOTES.md D9](NOTES.md#d9-scoring-rules-are-v1-heuristics-tunable).
+
+### Scoring caveats
+- Skiing uses Open-Meteo snow depth at the **town's** coordinates, not the slopes, so a
+  valley town like Chamonix under-reports the snow up high. Resort elevation would fix it.
+- The ski-area gate is "any ski area/piste within 50 km", so e.g. **Madrid** passes
+  (Sierra de Guadarrama resorts, and an indoor slope) and gets snow-based scores
+  (usually near 0 outside winter).
+- Surf uses max wave height/period at the nearest marine grid cell; no swell direction,
+  tide or spot orientation.
+- Indoor sightseeing is purely the inverse of outdoor weather; it doesn't know whether
+  the place has museums.
+- Public Overpass servers are often overloaded. A first-time lookup waits at most 15 s,
+  then skiing is `null` ("try again shortly") while the lookup finishes in the background.
+
+## Assumptions & open questions
+1. **Per activity across days** is the primary view; *best activity per day* is derivable
+   from the same 28 scores (`bestActivityPerDay`, not yet in the schema). Which does the
+   product want? Both?
+2. Ambiguous names resolve to the **top geocoding match**; `country` narrows it. Should we
+   return candidates instead?
+3. "Next 7 days" = today + 6 in the location's timezone; past days are dropped if data is
+   stale.
+4. `null` = can't assess, `0` = assessed and bad. Is that distinction useful to clients?
+5. 3 h TTL matches how often the forecast models update; tune with `FORECAST_TTL_HOURS`.
+
+## What I'd do next
+- Tune the heuristics against real feedback; use resort elevation for snow.
+- Stale-while-revalidate (serve old data instantly, refresh in the background).
+- Expose `bestActivityPerDay`; return geocoding candidates for ambiguous names.
+- Postgres + migrations and a shared lock/queue for in-flight fetches when running more
+  than one instance; rate limiting; metrics on cache hit rate and upstream latency.
+- Self-host or pre-compute the ski-area dataset instead of depending on public Overpass.
+
+## Tests
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+npm test            # unit: every scoring function, ranking, service caching/refresh, parsers
+npm run test:e2e    # GraphQL query through the whole app; network adapters faked
+npm run lint        # ESLint + Prettier (fixes); lint:check / format:check to only check
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Repo notes
+- [NOTES.md](NOTES.md) — dated decision log.
+- [examples/](examples/) — ready queries, `query.sh`, saved live responses.
+- [ai-sessions/](ai-sessions/) — AI session transcripts.

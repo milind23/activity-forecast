@@ -1,0 +1,185 @@
+{
+  "data": {
+    "activityForecast": {
+      "location": {
+        "name": "Chamonix",
+        "country": "France",
+        "countryCode": "FR",
+        "region": "Rhône-Alpes",
+        "latitude": 45.92375,
+        "longitude": 6.86933,
+        "timezone": "Europe/Paris"
+      },
+      "dataFreshness": {
+        "fetchedAt": "2026-10-14T16:20:47.931Z",
+        "isStale": false
+      },
+      "activities": [
+        {
+          "activity": "SKIING",
+          "bestDay": null,
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (19°C max)"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (21°C max)"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (20°C max)"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (16°C max)"
+            },
+            {
+              "date": "2026-10-18",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (9°C max)"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (20°C max)"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 0,
+              "reason": "little or no snow, snow depth 0 cm, mild (18°C max)"
+            }
+          ]
+        },
+        {
+          "activity": "SURFING",
+          "bestDay": null,
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-15",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-16",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-17",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-18",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-19",
+              "score": null,
+              "reason": "no coastal data"
+            },
+            {
+              "date": "2026-10-20",
+              "score": null,
+              "reason": "no coastal data"
+            }
+          ]
+        },
+        {
+          "activity": "OUTDOOR_SIGHTSEEING",
+          "bestDay": "2026-10-14",
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": 100,
+              "reason": "pleasant 19°C, sunny"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 100,
+              "reason": "pleasant 21°C, sunny"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 100,
+              "reason": "pleasant 20°C, sunny"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 100,
+              "reason": "pleasant 18°C, sunny"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 98,
+              "reason": "pleasant 20°C, sunny"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 86,
+              "reason": "rain likely (32%, 2.6 mm), pleasant 16°C, sunny"
+            },
+            {
+              "date": "2026-10-18",
+              "score": 46,
+              "reason": "rain likely (43%, 4.8 mm), cool (9°C max)"
+            }
+          ]
+        },
+        {
+          "activity": "INDOOR_SIGHTSEEING",
+          "bestDay": "2026-10-18",
+          "days": [
+            {
+              "date": "2026-10-18",
+              "score": 72,
+              "reason": "always available; mixed weather outside"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 48,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 41,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-14",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

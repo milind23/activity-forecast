@@ -1,0 +1,185 @@
+{
+  "data": {
+    "activityForecast": {
+      "location": {
+        "name": "Biarritz",
+        "country": "France",
+        "countryCode": "FR",
+        "region": "New Aquitaine",
+        "latitude": 43.48055,
+        "longitude": -1.55684,
+        "timezone": "Europe/Paris"
+      },
+      "dataFreshness": {
+        "fetchedAt": "2026-10-14T16:35:37.365Z",
+        "isStale": false
+      },
+      "activities": [
+        {
+          "activity": "SKIING",
+          "bestDay": null,
+          "days": [
+            {
+              "date": "2026-10-14",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            },
+            {
+              "date": "2026-10-15",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            },
+            {
+              "date": "2026-10-16",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            },
+            {
+              "date": "2026-10-17",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            },
+            {
+              "date": "2026-10-18",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            },
+            {
+              "date": "2026-10-19",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            },
+            {
+              "date": "2026-10-20",
+              "score": null,
+              "reason": "ski area lookup unavailable, try again shortly"
+            }
+          ]
+        },
+        {
+          "activity": "SURFING",
+          "bestDay": "2026-10-20",
+          "days": [
+            {
+              "date": "2026-10-20",
+              "score": 100,
+              "reason": "waves 1.3 m, period 14 s"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 98,
+              "reason": "waves 2.0 m, period 13 s"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 96,
+              "reason": "waves 1.7 m, period 12 s"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 95,
+              "reason": "waves 2.0 m, period 12 s"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 93,
+              "reason": "waves 1.2 m, period 11 s"
+            },
+            {
+              "date": "2026-10-14",
+              "score": 92,
+              "reason": "waves 1.2 m, period 11 s"
+            },
+            {
+              "date": "2026-10-18",
+              "score": 86,
+              "reason": "waves 1.7 m, period 9 s"
+            }
+          ]
+        },
+        {
+          "activity": "OUTDOOR_SIGHTSEEING",
+          "bestDay": "2026-10-18",
+          "days": [
+            {
+              "date": "2026-10-18",
+              "score": 100,
+              "reason": "cool (15°C max), sunny"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 100,
+              "reason": "pleasant 22°C, sunny"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 95,
+              "reason": "hot (28°C max), sunny"
+            },
+            {
+              "date": "2026-10-14",
+              "score": 94,
+              "reason": "hot (28°C max), sunny"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 84,
+              "reason": "rain likely (43%, 0.0 mm), cool (14°C max), sunny"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 69,
+              "reason": "rain likely (57%, 0.3 mm), pleasant 21°C"
+            },
+            {
+              "date": "2026-10-17",
+              "score": 64,
+              "reason": "rain likely (49%, 6.0 mm), pleasant 19°C"
+            }
+          ]
+        },
+        {
+          "activity": "INDOOR_SIGHTSEEING",
+          "bestDay": "2026-10-17",
+          "days": [
+            {
+              "date": "2026-10-17",
+              "score": 62,
+              "reason": "always available; mixed weather outside"
+            },
+            {
+              "date": "2026-10-16",
+              "score": 59,
+              "reason": "always available; mixed weather outside"
+            },
+            {
+              "date": "2026-10-19",
+              "score": 50,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-14",
+              "score": 44,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-15",
+              "score": 43,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-18",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            },
+            {
+              "date": "2026-10-20",
+              "score": 40,
+              "reason": "always available, but the weather favours being outdoors"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
