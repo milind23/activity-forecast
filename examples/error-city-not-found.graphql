@@ -1,0 +1,4 @@
+# Expected: errors[0].extensions.code = "CITY_NOT_FOUND"
+query NotFound {
+  activityForecast(city: "Xyzzyville") { location { name } }
+}
