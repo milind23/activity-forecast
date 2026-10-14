@@ -64,6 +64,10 @@ had no prebuilt binary here and fell back to a node-gyp compile — exactly the 
 setup friction an interviewer shouldn't hit. sql.js keeps the DB in memory and writes
 the file on each change (`autoSave`), which is fine for a small cache; for real
 traffic I'd switch driver (or DB) without touching the domain/application layers.
+**Caveat found while testing:** because sql.js holds the whole DB in memory and rewrites
+the file, two processes sharing one DB file overwrite each other's writes (seen during
+`start:dev` watch restarts overlapping with a background lookup). One process per DB
+file; a real multi-instance deployment needs a server DB.
 
 Tables: `geocode_cache`, `forecast_snapshot` (raw weather + marine JSON,
 `fetchedAt`), `ski_terrain`. `synchronize: true` creates them on first run — fine for
