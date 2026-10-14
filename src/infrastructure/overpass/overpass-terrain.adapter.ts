@@ -4,6 +4,11 @@ import { TerrainProviderPort } from '../../application/ports';
 import { AppConfig } from '../../config/configuration';
 import { asUpstreamError, fetchJson } from '../http/fetch-json';
 
+/** Busy public servers often succeed on a quick retry (observed ~50% 504s). */
+const ATTEMPTS_PER_ENDPOINT = 2;
+const RETRY_DELAY_MS = 1000;
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 interface OverpassResponse {
   elements?: unknown[];
 }
@@ -30,13 +35,16 @@ export class OverpassTerrainAdapter implements TerrainProviderPort {
     const query = buildSkiAreaQuery(latitude, longitude, radiusKm);
     let lastError: unknown = new Error('no Overpass endpoint configured');
     for (const url of this.cfg.overpassUrls) {
-      try {
-        return await this.query(url, query);
-      } catch (err) {
-        lastError = err;
-        this.logger.warn(
-          `Overpass endpoint ${url} failed: ${(err as Error).message}`,
-        );
+      for (let attempt = 1; attempt <= ATTEMPTS_PER_ENDPOINT; attempt++) {
+        try {
+          return await this.query(url, query);
+        } catch (err) {
+          lastError = err;
+          this.logger.warn(
+            `Overpass ${url} attempt ${attempt} failed: ${(err as Error).message}`,
+          );
+          await sleep(RETRY_DELAY_MS * attempt);
+        }
       }
     }
     throw asUpstreamError('overpass', lastError);
