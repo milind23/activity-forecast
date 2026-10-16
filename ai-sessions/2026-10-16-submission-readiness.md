@@ -26,7 +26,7 @@ This is a chronological working summary, not a reconstructed verbatim AI transcr
 - Linked the reviewer guide prominently from the README and updated the current latency
   caveat. D22 records why the limit changed.
 
-## Repository state discovered
+## Repository state discovered before publication
 
 - The current branch is `main`.
 - No Git remote is configured, so no public GitHub destination exists yet.
@@ -45,7 +45,24 @@ This is a chronological working summary, not a reconstructed verbatim AI transcr
 - Docker runtime was not re-tested because the local daemon remains unavailable; Compose
   configuration had already passed validation. This remains a human pre-submission check.
 
-## Human sign-off before push
+## Publication and CI follow-up
+
+- The candidate authorized creation of the public repository
+  `https://github.com/milind23/activity-forecast` and a push of `main`.
+- Commit `aa157e0` was pushed, and a fresh public clone passed `npm ci` plus the full
+  `npm run verify` gate: formatting, lint, build, 107 unit tests, 20 end-to-end tests and
+  zero production dependency vulnerabilities.
+- The first Ubuntu GitHub Actions run failed before tests because `npm ci` found two
+  platform-resolved optional peer packages missing from the macOS-generated lockfile:
+  `@emnapi/core` and `@emnapi/runtime`. This was a lockfile portability issue, not a test
+  or application failure.
+- A clean lockfile was regenerated from `package.json` in an empty temporary directory.
+  The replacement was also validated using Linux resolution with
+  `npm ci --package-lock-only --ignore-scripts --os=linux --cpu=x64` before committing.
+  CI success is intentionally not claimed in this note until GitHub runs the corrective
+  commit.
+
+## Human sign-off still required before submission
 
 - [ ] I ran `npm ci` and `npm run verify` myself from the final tree.
 - [ ] I started the service and ran `./examples/query.sh` myself.
