@@ -1,12 +1,6 @@
 import { ArgsType, Field } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Matches,
-  MaxLength,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
@@ -22,12 +16,13 @@ export class ActivityForecastArgs {
 
   @Field(() => String, {
     nullable: true,
-    description: 'Optional ISO 3166-1 alpha-2 country filter, e.g. "FR"',
+    description:
+      'Optional English country name or ISO alpha-2/alpha-3 code, e.g. "India", "USA" or "US"',
   })
   @Transform(trim)
   @IsOptional()
-  @Matches(/^[A-Za-z]{2}$/, {
-    message: 'country must be a 2-letter ISO 3166-1 alpha-2 code, e.g. "FR"',
-  })
+  @IsString()
+  @IsNotEmpty({ message: 'country must not be empty' })
+  @MaxLength(100)
   country?: string;
 }

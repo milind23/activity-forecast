@@ -17,6 +17,24 @@ export class ForecastSnapshotEntity {
   @Column('simple-json', { nullable: true })
   marineRaw!: unknown | null;
 
+  @Column('varchar', { nullable: true })
+  marineStatus!: string | null;
+
+  @Column('datetime', { nullable: true })
+  marineFetchedAt!: Date | null;
+
+  @Column('boolean', { nullable: true })
+  marineIsStale!: boolean | null;
+
+  @Column('simple-json', { nullable: true })
+  skiWeatherRaw!: unknown | null;
+
+  @Column('varchar', { nullable: true })
+  skiWeatherLocationKey!: string | null;
+
+  @Column('datetime', { nullable: true })
+  skiWeatherFetchedAt!: Date | null;
+
   @Column('datetime')
   fetchedAt!: Date;
 }

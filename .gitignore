@@ -1,7 +1,11 @@
 node_modules/
 dist/
 coverage/
+*.tsbuildinfo
 *.sqlite
 *.sqlite-journal
 data/
 .env
+.vscode/
+deploy/certs/*
+!deploy/certs/.gitkeep

@@ -1,0 +1,22 @@
+# Recommended reviewer smoke test. Chamonix has a reviewed ski-area catalog entry,
+# so this demonstrates mountain-aware recommendations without depending on public
+# Overpass discovery during the request.
+query ReviewerDemo {
+  activityRecommendations(city: "Chamonix", country: "France") {
+    destination
+    summary
+    recommendations {
+      activity
+      action
+      bookingReadiness
+      confidence
+      recommendedDate
+      score
+      dataAsOf
+      message
+      evidence
+      checksBeforeBooking
+    }
+    advisory
+  }
+}

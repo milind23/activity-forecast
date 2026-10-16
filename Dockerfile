@@ -1,5 +1,5 @@
 # --- build ---
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -8,7 +8,7 @@ COPY src ./src
 RUN npm run build && npm prune --omit=dev
 
 # --- run ---
-FROM node:20-alpine
+FROM node:24-alpine
 ENV NODE_ENV=production \
     DATABASE_PATH=/app/data/activity-forecast.sqlite
 WORKDIR /app

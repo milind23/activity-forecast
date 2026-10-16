@@ -1,0 +1,46 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATABASE_PATH: /app/data/activity-forecast.sqlite
+      AUTH_REQUIRED: "true"
+      AUTH_API_KEYS_JSON: ${AUTH_API_KEYS_JSON:?set AUTH_API_KEYS_JSON}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?set CORS_ALLOWED_ORIGINS}
+      TRUST_PROXY_HOPS: "1"
+      REQUEST_BODY_LIMIT: 16kb
+      RATE_LIMIT_WINDOW_MS: "60000"
+      RATE_LIMIT_MAX: "60"
+      GRAPHQL_MAX_DEPTH: "8"
+      GRAPHQL_MAX_ALIASES: "15"
+      GRAPHQL_MAX_ROOT_FIELDS: "4"
+      GRAPHQL_MAX_COMPLEXITY: "100"
+    volumes:
+      - forecast-data:/app/data
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  gateway:
+    image: nginx:1.28-alpine
+    depends_on:
+      - api
+    environment:
+      SERVER_NAME: ${SERVER_NAME:?set SERVER_NAME}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./certs:/etc/nginx/certs:ro
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  forecast-data:

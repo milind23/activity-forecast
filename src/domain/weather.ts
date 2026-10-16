@@ -23,6 +23,8 @@ export interface DailyMarine {
   wavePeriodMaxS: number | null;
 }
 
+export type MarineDataStatus = 'available' | 'not_applicable' | 'unavailable';
+
 /** WMO codes 95-99 are thunderstorms. */
 export function isThunderstorm(code: number | null): boolean {
   return code !== null && code >= 95;

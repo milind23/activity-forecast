@@ -1,10 +1,13 @@
+import { SkiArea } from '../../domain';
+
 export const TERRAIN_PROVIDER = Symbol('TERRAIN_PROVIDER');
 
 export interface TerrainProviderPort {
-  /** Is there a ski resort / downhill piste within radiusKm? Throws on upstream failure. */
-  hasSkiAreaNearby(
+  /** Finds a concrete ski resort/downhill piste. Throws on upstream failure. */
+  findSkiAreaNearby(
     latitude: number,
     longitude: number,
     radiusKm: number,
-  ): Promise<boolean>;
+    countryCode?: string,
+  ): Promise<SkiArea | null>;
 }

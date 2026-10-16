@@ -1,4 +1,4 @@
-import { Location } from '../../domain';
+import { Location, MarineDataStatus, SkiArea } from '../../domain';
 
 export const FORECAST_REPOSITORY = Symbol('FORECAST_REPOSITORY');
 
@@ -7,12 +7,19 @@ export interface ForecastSnapshot {
   weatherRaw: unknown;
   /** null = no marine data for this location. */
   marineRaw: unknown | null;
+  marineStatus?: MarineDataStatus;
+  marineFetchedAt?: Date | null;
+  marineIsStale?: boolean;
+  skiWeatherRaw?: unknown | null;
+  skiWeatherLocationKey?: string | null;
+  skiWeatherFetchedAt?: Date | null;
   fetchedAt: Date;
 }
 
 export interface SkiTerrainRecord {
   locationKey: string;
   hasSkiArea: boolean;
+  skiArea?: SkiArea | null;
   checkedAt: Date;
 }
 

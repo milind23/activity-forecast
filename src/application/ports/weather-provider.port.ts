@@ -8,6 +8,10 @@ export const WEATHER_PROVIDER = Symbol('WEATHER_PROVIDER');
  */
 export interface WeatherProviderPort {
   /** Throws UpstreamUnavailableError on failure. */
-  fetchRaw(latitude: number, longitude: number): Promise<unknown>;
+  fetchRaw(
+    latitude: number,
+    longitude: number,
+    elevationM?: number,
+  ): Promise<unknown>;
   parse(raw: unknown): DailyWeather[];
 }

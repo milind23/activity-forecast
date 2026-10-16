@@ -9,6 +9,15 @@ export class CityNotFoundError extends Error {
   }
 }
 
+export class InvalidCountryError extends Error {
+  constructor(readonly country: string) {
+    super(
+      `Country not recognized: "${country}". Use an English country name or ISO alpha-2/alpha-3 code.`,
+    );
+    this.name = 'InvalidCountryError';
+  }
+}
+
 export class UpstreamUnavailableError extends Error {
   constructor(
     readonly source: string,

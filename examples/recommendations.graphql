@@ -1,0 +1,21 @@
+# Product-facing query: only city/country input and actionable output.
+# Country names and ISO alpha-2/alpha-3 codes are accepted case-insensitively.
+query ActivityRecommendations {
+  activityRecommendations(city: "Mumbai", country: "India") {
+    destination
+    summary
+    recommendations {
+      activity
+      action
+      bookingReadiness
+      confidence
+      recommendedDate
+      score
+      dataAsOf
+      message
+      evidence
+      checksBeforeBooking
+    }
+    advisory
+  }
+}

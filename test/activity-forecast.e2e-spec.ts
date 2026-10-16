@@ -10,6 +10,7 @@ import {
 } from '../src/application/ports';
 import { parseOpenMeteoForecast } from '../src/infrastructure/open-meteo/open-meteo-weather.adapter';
 import { parseOpenMeteoMarine } from '../src/infrastructure/open-meteo/open-meteo-marine.adapter';
+import { SkiAreaSource, SkiOperatingStatus } from '../src/domain';
 import { chamonixLocation, chamonixWeatherRaw } from './fixtures';
 
 /**
@@ -31,7 +32,18 @@ describe('activityForecast query (e2e)', () => {
     fetchRaw: jest.fn(async () => null),
     parse: parseOpenMeteoMarine,
   };
-  const terrain = { hasSkiAreaNearby: jest.fn(async () => true) };
+  const terrain = {
+    findSkiAreaNearby: jest.fn(async () => ({
+      id: 'test:chamonix',
+      name: 'Test Chamonix ski area',
+      latitude: chamonixLocation.latitude,
+      longitude: chamonixLocation.longitude,
+      forecastElevationM: null,
+      source: SkiAreaSource.CURATED_CATALOG,
+      operatingStatus: SkiOperatingStatus.UNKNOWN,
+      operationsUrl: 'https://example.test/chamonix/status',
+    })),
+  };
   const realFetch = global.fetch;
 
   beforeAll(async () => {
@@ -93,8 +105,34 @@ describe('activityForecast query (e2e)', () => {
       .post('/graphql')
       .send({ query: QUERY, variables });
 
+  const RECOMMENDATIONS_QUERY = /* GraphQL */ `
+    query ($city: String!, $country: String) {
+      activityRecommendations(city: $city, country: $country) {
+        destination
+        summary
+        recommendations {
+          activity
+          action
+          bookingReadiness
+          confidence
+          recommendedDate
+          score
+          dataAsOf
+          message
+          evidence
+          checksBeforeBooking
+        }
+        advisory
+      }
+    }
+  `;
+  const recommendationGql = (variables: Record<string, unknown>) =>
+    request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: RECOMMENDATIONS_QUERY, variables });
+
   it('returns ranked activities for a city', async () => {
-    const res = await gql({ city: 'Chamonix', country: 'FR' }).expect(200);
+    const res = await gql({ city: 'Chamonix', country: 'France' }).expect(200);
     expect(res.body.errors).toBeUndefined();
     const f = res.body.data.activityForecast;
 
@@ -126,17 +164,56 @@ describe('activityForecast query (e2e)', () => {
     expect(ski.days[0].reason).toContain('fresh snow');
     expect(surf.bestDay).toBeNull();
     expect(surf.days[0]).toMatchObject({
-      score: null,
-      reason: 'no coastal data',
+      score: 0,
+      reason: 'no coastal waters near this location',
     });
     expect(outdoor.days[6].reason).toMatch(/thunderstorms|rain/);
+    expect(geocoder.search).toHaveBeenCalledWith('Chamonix', 'FR');
+  });
+
+  it('returns lean, actionable recommendations from a full country name', async () => {
+    const res = await recommendationGql({
+      city: 'Chamonix',
+      country: 'FRANCE',
+    }).expect(200);
+    expect(res.body.errors).toBeUndefined();
+    const result = res.body.data.activityRecommendations;
+
+    expect(result.destination).toBe('Chamonix-Mont-Blanc, France');
+    expect(result.summary).toContain('Strong weather windows');
+    expect(result.recommendations).toHaveLength(4);
+    expect(result.recommendations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          activity: 'SKIING',
+          action: 'PLAN',
+          bookingReadiness: 'VERIFY_LIVE_STATUS',
+          confidence: 'MEDIUM',
+          recommendedDate: expect.any(String),
+          score: expect.any(Number),
+          message: expect.stringContaining('Plan skiing'),
+        }),
+        expect.objectContaining({
+          activity: 'SURFING',
+          action: 'SKIP',
+          bookingReadiness: 'NOT_APPLICABLE',
+          confidence: 'HIGH',
+          recommendedDate: null,
+          score: 0,
+          message: expect.stringContaining('Skip surfing'),
+        }),
+      ]),
+    );
+    expect(result.advisory).toContain('before booking');
+    expect(result).not.toHaveProperty('location');
+    expect(result).not.toHaveProperty('dataFreshness');
   });
 
   it('persists the forecast and does not refetch on the next request', async () => {
     await gql({ city: 'Chamonix', country: 'FR' }).expect(200);
     expect(geocoder.search).toHaveBeenCalledTimes(1);
     expect(weather.fetchRaw).toHaveBeenCalledTimes(1);
-    expect(terrain.hasSkiAreaNearby).toHaveBeenCalledTimes(1);
+    expect(terrain.findSkiAreaNearby).toHaveBeenCalledTimes(1);
   });
 
   it('returns CITY_NOT_FOUND for unknown places', async () => {
@@ -146,10 +223,10 @@ describe('activityForecast query (e2e)', () => {
     expect(res.body.errors[0].message).toContain('Xyzzyville');
   });
 
-  it('rejects an invalid country code with a validation error', async () => {
-    const res = await gql({ city: 'Paris', country: 'France' }).expect(200);
-    expect(res.body.errors[0].extensions.code).toBe('BAD_REQUEST');
-    expect(res.body.errors[0].message).toContain('2-letter ISO');
+  it('rejects an unrecognized country before geocoding', async () => {
+    const res = await gql({ city: 'Paris', country: 'Atlantis' }).expect(200);
+    expect(res.body.errors[0].extensions.code).toBe('INVALID_COUNTRY');
+    expect(res.body.errors[0].message).toContain('Country not recognized');
     expect(geocoder.search).not.toHaveBeenCalledWith(
       'Paris',
       expect.anything(),

@@ -11,8 +11,7 @@
  */
 import { DailyWeather } from '../weather';
 import { ScoreResult, clampScore, scale } from '../score';
-
-export type SkiAreaStatus = 'nearby' | 'none' | 'unknown';
+import { SkiAreaStatus } from '../ski-area';
 
 export const SKI = {
   MIN_BASE_M: 0.1,
@@ -29,6 +28,8 @@ export const SKI = {
   WIND_CALM_KMH: 30,
   WIND_LIFTS_CLOSED_KMH: 60,
   WIND_POINTS: 10,
+  /** A likely lift-closure day must never cross the PLAN/CONSIDER thresholds. */
+  LIFT_CLOSURE_CAP: 39,
   /** No base and no fresh snow means nothing to ski on: capped here (0 keeps bestDay null). */
   NO_SNOW_CAP: 0,
 } as const;
@@ -89,6 +90,10 @@ export function scoreSkiing(
   if (wind > SKI.WIND_CALM_KMH) notes.push(`windy (${Math.round(wind)} km/h)`);
 
   let score = basePts + freshPts + tempPts + windPts;
+  if (wind >= SKI.WIND_LIFTS_CLOSED_KMH) {
+    score = Math.min(score, SKI.LIFT_CLOSURE_CAP);
+    notes.push('lift-closing wind likely');
+  }
   if (depth < SKI.MIN_BASE_M && snowfall < 1) {
     score = Math.min(score, SKI.NO_SNOW_CAP);
     notes.unshift('little or no snow');

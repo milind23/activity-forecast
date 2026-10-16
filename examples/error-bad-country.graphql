@@ -1,4 +1,4 @@
-# Expected: errors[0].extensions.code = "BAD_REQUEST" (country must be an ISO alpha-2 code like "FR")
+# Expected: errors[0].extensions.code = "INVALID_COUNTRY"
 query BadCountry {
-  activityForecast(city: "Paris", country: "France") { location { name } }
+  activityForecast(city: "Paris", country: "Atlantis") { location { name } }
 }

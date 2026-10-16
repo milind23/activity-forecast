@@ -34,7 +34,11 @@ export class OpenMeteoWeatherAdapter implements WeatherProviderPort {
     this.cfg = config.getOrThrow<AppConfig>('app');
   }
 
-  async fetchRaw(latitude: number, longitude: number): Promise<unknown> {
+  async fetchRaw(
+    latitude: number,
+    longitude: number,
+    elevationM?: number,
+  ): Promise<unknown> {
     const params = new URLSearchParams({
       latitude: String(latitude),
       longitude: String(longitude),
@@ -43,6 +47,7 @@ export class OpenMeteoWeatherAdapter implements WeatherProviderPort {
       timezone: 'auto',
       forecast_days: '7',
     });
+    if (elevationM !== undefined) params.set('elevation', String(elevationM));
     try {
       return await fetchJson(
         'open-meteo forecast',

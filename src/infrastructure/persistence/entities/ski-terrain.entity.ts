@@ -9,6 +9,9 @@ export class SkiTerrainEntity {
   @Column('boolean')
   hasSkiArea!: boolean;
 
+  @Column('simple-json', { nullable: true })
+  skiArea!: unknown | null;
+
   @Column('datetime')
   checkedAt!: Date;
 }

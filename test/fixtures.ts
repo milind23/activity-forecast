@@ -1,11 +1,8 @@
+import { nextLocalDates } from '../src/application/activity-forecast.service';
+
 /** Fixture payloads shaped like the real Open-Meteo responses, dated from today. */
 export function isoDays(n: number, timeZone: string): string[] {
-  const out: string[] = [];
-  for (let i = 0; i < n; i++) {
-    const d = new Date(Date.now() + i * 86_400_000);
-    out.push(new Intl.DateTimeFormat('en-CA', { timeZone }).format(d));
-  }
-  return out;
+  return nextLocalDates(new Date(), timeZone, n);
 }
 
 export const chamonixLocation = {

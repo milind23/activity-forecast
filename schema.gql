@@ -25,11 +25,63 @@ type ActivityRanking {
   days: [DayScore!]!
 }
 
+type ActivityRecommendation {
+  action: RecommendationAction!
+  activity: Activity!
+  bookingReadiness: BookingReadiness!
+
+  """Live or local checks still required before purchasing"""
+  checksBeforeBooking: [String!]!
+  confidence: RecommendationConfidence!
+
+  """When the activity-specific forecast evidence was fetched"""
+  dataAsOf: DateTime
+
+  """Compact evidence and source provenance behind the decision"""
+  evidence: [String!]!
+
+  """Human-readable decision and its main weather reason"""
+  message: String!
+
+  """YYYY-MM-DD when action is PLAN or CONSIDER; otherwise null"""
+  recommendedDate: String
+
+  """
+  Activity-specific weather score for the best assessed day; null if required data is unavailable. Scores are not calibrated across activities.
+  """
+  score: Int
+}
+
+type ActivityRecommendations {
+  """Important limits on weather-based recommendations"""
+  advisory: String!
+
+  """Resolved place name, without exposing coordinates"""
+  destination: String!
+  recommendations: [ActivityRecommendation!]!
+
+  """One-line overview; does not compare unlike activity scores"""
+  summary: String!
+}
+
+"""
+Whether the result is ready to plan, needs live verification, is not recommended/applicable, or lacks data
+"""
+enum BookingReadiness {
+  DATA_UNAVAILABLE
+  NOT_APPLICABLE
+  NOT_RECOMMENDED
+  READY_TO_PLAN
+  VERIFY_LIVE_STATUS
+}
+
 type DataFreshness {
-  """When the underlying forecast was fetched from Open-Meteo"""
+  """When the atmospheric forecast was fetched from Open-Meteo"""
   fetchedAt: DateTime!
 
-  """true if a refresh failed and older stored data is being served"""
+  """
+  true if atmospheric refresh failed and stored weather is being served; marine data may independently be older
+  """
   isStale: Boolean!
 }
 
@@ -43,7 +95,9 @@ type DayScore {
   date: String!
   reason: String!
 
-  """0-100; null when it cannot be assessed"""
+  """
+  0-100 activity-specific weather suitability; null when required data is unavailable. See docs/SCORING.md.
+  """
   score: Int
 }
 
@@ -65,7 +119,7 @@ type Location {
 
 type Query {
   """
-  Ranks the next 7 days for skiing, surfing, outdoor and indoor sightseeing in a city. Each activity lists its days best-first plus a bestDay.
+  Detailed evidence view. Ranks the next 7 days for skiing, surfing, outdoor and indoor sightseeing in a city. Each activity lists its days best-first plus a bestDay.
   """
   activityForecast(
     """
@@ -74,8 +128,41 @@ type Query {
     city: String!
 
     """
-    Optional ISO 3166-1 alpha-2 country filter, e.g. "FR"
+    Optional English country name or ISO alpha-2/alpha-3 code, e.g. "India", "USA" or "US"
     """
     country: String
   ): ActivityForecast!
+
+  """
+  Product-facing recommendation for the next 7 days. Returns a weather action, booking readiness, confidence, compact evidence and required live checks per activity.
+  """
+  activityRecommendations(
+    """
+    City or town name, e.g. "Chamonix"
+    """
+    city: String!
+
+    """
+    Optional English country name or ISO alpha-2/alpha-3 code, e.g. "India", "USA" or "US"
+    """
+    country: String
+  ): ActivityRecommendations!
+}
+
+"""
+PLAN (strong fit), CONSIDER (reasonable), SKIP (poor fit), or UNAVAILABLE (insufficient data)
+"""
+enum RecommendationAction {
+  CONSIDER
+  PLAN
+  SKIP
+  UNAVAILABLE
+}
+
+"""Confidence in the evidence available for this decision"""
+enum RecommendationConfidence {
+  HIGH
+  LOW
+  MEDIUM
+  NONE
 }

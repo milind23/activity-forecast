@@ -40,10 +40,10 @@ describe('scoreSkiing', () => {
     expect(mild.reason).toContain('mild');
   });
 
-  it('penalises strong wind', () => {
+  it('caps likely lift-closing wind below the recommendation thresholds', () => {
     const windy = scoreSkiing({ ...powderDay, windSpeedMaxKmh: 70 }, 'nearby');
-    expect(windy.score).toBe(90);
-    expect(windy.reason).toContain('windy');
+    expect(windy.score).toBe(39);
+    expect(windy.reason).toContain('lift-closing wind likely');
   });
 
   it('treats missing snow data as no snow', () => {

@@ -4,7 +4,11 @@ import {
   parseOpenMeteoMarine,
 } from './open-meteo-marine.adapter';
 import { parseOpenMeteoForecast } from './open-meteo-weather.adapter';
-import { buildSkiAreaQueries } from '../overpass/overpass-terrain.adapter';
+import {
+  buildSkiAreaQueries,
+  toSkiArea,
+} from '../overpass/overpass-terrain.adapter';
+import { findCatalogSkiArea } from '../overpass/ski-resort-catalog';
 
 describe('Open-Meteo parsers', () => {
   it('maps the forecast payload and takes the daily max of hourly snow depth', () => {
@@ -109,5 +113,39 @@ describe('Open-Meteo parsers', () => {
     expect(resorts).toContain('"landuse"="winter_sports"');
     expect(pistes).toContain('"piste:type"="downhill"');
     expect(resorts).toContain('around:50000,45.92,6.87');
+    expect(resorts).toContain('out tags center');
+  });
+
+  it('resolves Zermatt from the local resort catalogue without Overpass', () => {
+    expect(
+      findCatalogSkiArea(
+        { countryCode: 'CH', latitude: 45.9763, longitude: 7.6586 },
+        50,
+      ),
+    ).toMatchObject({
+      name: 'Matterhorn Ski Paradise',
+      forecastElevationM: 3000,
+      source: 'CURATED_CATALOG',
+    });
+  });
+
+  it('turns a concrete Overpass result into a mountain forecast target', () => {
+    expect(
+      toSkiArea({
+        type: 'way',
+        id: 123,
+        center: { lat: 46.1, lon: 7.2 },
+        tags: { name: 'Mapped Resort', ele: '2400' },
+      }),
+    ).toMatchObject({
+      id: 'osm:way:123',
+      name: 'Mapped Resort',
+      latitude: 46.1,
+      longitude: 7.2,
+      forecastElevationM: 2400,
+      source: 'OPENSTREETMAP',
+      sourceUrl: 'https://www.openstreetmap.org/way/123',
+      operationsUrl: null,
+    });
   });
 });

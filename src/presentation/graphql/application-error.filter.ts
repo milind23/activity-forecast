@@ -2,6 +2,7 @@ import { Catch, Logger } from '@nestjs/common';
 import { GqlExceptionFilter } from '@nestjs/graphql';
 import {
   CityNotFoundError,
+  InvalidCountryError,
   UpstreamUnavailableError,
 } from '../../application/errors';
 import { toGraphQLError } from './error-mapping';
@@ -11,11 +12,13 @@ import { toGraphQLError } from './error-mapping';
  * Using a filter (rather than try/catch in resolvers) keeps resolvers thin and
  * stops Nest logging client mistakes like "city not found" as server ERRORs.
  */
-@Catch(CityNotFoundError, UpstreamUnavailableError)
+@Catch(CityNotFoundError, InvalidCountryError, UpstreamUnavailableError)
 export class ApplicationErrorFilter implements GqlExceptionFilter {
   private readonly logger = new Logger('GraphQL');
 
-  catch(err: CityNotFoundError | UpstreamUnavailableError) {
+  catch(
+    err: CityNotFoundError | InvalidCountryError | UpstreamUnavailableError,
+  ) {
     if (err instanceof UpstreamUnavailableError) this.logger.error(err.message);
     else this.logger.log(err.message);
     return toGraphQLError(err);

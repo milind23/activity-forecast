@@ -45,7 +45,20 @@ export class TypeOrmForecastRepository implements ForecastRepositoryPort {
 
   async findSnapshot(locationKey: string): Promise<ForecastSnapshot | null> {
     const row = await this.snapshots.findOneBy({ locationKey });
-    return row ? { ...row, fetchedAt: new Date(row.fetchedAt) } : null;
+    return row
+      ? {
+          ...row,
+          marineStatus: row.marineStatus as ForecastSnapshot['marineStatus'],
+          marineIsStale: row.marineIsStale ?? undefined,
+          fetchedAt: new Date(row.fetchedAt),
+          marineFetchedAt: row.marineFetchedAt
+            ? new Date(row.marineFetchedAt)
+            : null,
+          skiWeatherFetchedAt: row.skiWeatherFetchedAt
+            ? new Date(row.skiWeatherFetchedAt)
+            : null,
+        }
+      : null;
   }
 
   async saveSnapshot(s: ForecastSnapshot): Promise<void> {
@@ -54,7 +67,14 @@ export class TypeOrmForecastRepository implements ForecastRepositoryPort {
 
   async findSkiTerrain(locationKey: string): Promise<SkiTerrainRecord | null> {
     const row = await this.terrain.findOneBy({ locationKey });
-    return row ? { ...row, checkedAt: new Date(row.checkedAt) } : null;
+    return row
+      ? {
+          locationKey: row.locationKey,
+          hasSkiArea: row.hasSkiArea,
+          skiArea: row.skiArea as SkiTerrainRecord['skiArea'],
+          checkedAt: new Date(row.checkedAt),
+        }
+      : null;
   }
 
   async saveSkiTerrain(r: SkiTerrainRecord): Promise<void> {

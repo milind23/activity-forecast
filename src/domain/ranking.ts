@@ -4,8 +4,9 @@
  */
 import { ALL_ACTIVITIES, Activity } from './activity';
 import { DayScore, ScoreResult } from './score';
-import { DailyMarine, DailyWeather } from './weather';
-import { SkiAreaStatus, scoreSkiing } from './scoring/skiing';
+import { DailyMarine, DailyWeather, MarineDataStatus } from './weather';
+import { SkiAreaStatus } from './ski-area';
+import { scoreSkiing } from './scoring/skiing';
 import { scoreSurfing } from './scoring/surfing';
 import { scoreOutdoorSightseeing } from './scoring/outdoor-sightseeing';
 import { scoreIndoorSightseeing } from './scoring/indoor-sightseeing';
@@ -13,6 +14,9 @@ import { scoreIndoorSightseeing } from './scoring/indoor-sightseeing';
 export interface ScoringContext {
   skiArea: SkiAreaStatus;
   marineByDate: ReadonlyMap<string, DailyMarine>;
+  /** undefined keeps legacy city weather; null means mountain weather failed. */
+  skiWeatherByDate?: ReadonlyMap<string, DailyWeather> | null;
+  marineStatus?: MarineDataStatus;
 }
 
 export interface ActivityRanking {
@@ -29,9 +33,24 @@ export function scoreDay(
   ctx: ScoringContext,
 ): ScoreResult {
   switch (activity) {
-    case Activity.SKIING:
-      return scoreSkiing(day, ctx.skiArea);
+    case Activity.SKIING: {
+      if (ctx.skiArea !== 'nearby') return scoreSkiing(day, ctx.skiArea);
+      if (ctx.skiWeatherByDate === null) {
+        return { score: null, reason: 'mountain forecast unavailable' };
+      }
+      const skiDay =
+        ctx.skiWeatherByDate === undefined
+          ? day
+          : ctx.skiWeatherByDate?.get(day.date);
+      if (!skiDay)
+        return { score: null, reason: 'mountain forecast unavailable' };
+      return scoreSkiing(skiDay, ctx.skiArea);
+    }
     case Activity.SURFING:
+      if (ctx.marineStatus === 'not_applicable')
+        return { score: 0, reason: 'no coastal waters near this location' };
+      if (ctx.marineStatus === 'unavailable')
+        return { score: null, reason: 'marine forecast unavailable' };
       return scoreSurfing(day, ctx.marineByDate.get(day.date));
     case Activity.OUTDOOR_SIGHTSEEING:
       return scoreOutdoorSightseeing(day);
